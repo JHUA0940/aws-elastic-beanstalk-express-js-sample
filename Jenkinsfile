@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
         // Replace 'snyk-token' with your Jenkins credential ID for the Snyk API token
-        SNYK_TOKEN = credentials('21712836')
+        SNYK_TOKEN = credentials('jiasheng')
     }
     stages {
         stage('Checkout') {
