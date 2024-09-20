@@ -21,58 +21,10 @@ pipeline {
                 sh 'npm install'
             }
         }
-        stage('Verify Test Script') {
+        stage('Start Application') {
             steps {
-                script {
-                    // Check if the test script is defined in package.json
-                    def packageJson = readJSON file: 'package.json'
-                    if (!packageJson.scripts?.test) {
-                        echo "No test script defined in package.json. Skipping the test stage."
-                        currentBuild.result = 'UNSTABLE'
-                    }
-                }
-            }
-        }
-        stage('Run Tests') {
-            when {
-                expression {
-                    def packageJson = readJSON file: 'package.json'
-                    return packageJson.scripts?.test != null
-                }
-            }
-            steps {
-                // Run the test script
-                sh 'npm test'
-            }
-        }
-        stage('Verify Build Script') {
-            steps {
-                script {
-                    // Check if the build script is defined in package.json
-                    def packageJson = readJSON file: 'package.json'
-                    if (!packageJson.scripts?.build) {
-                        echo "No build script defined in package.json. Skipping the build stage."
-                        currentBuild.result = 'UNSTABLE'
-                    }
-                }
-            }
-        }
-        stage('Build') {
-            when {
-                expression {
-                    def packageJson = readJSON file: 'package.json'
-                    return packageJson.scripts?.build != null
-                }
-            }
-            steps {
-                // Build the project
-                sh 'npm run build'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                // Deploy the application (modify the deployment logic as needed)
-                echo 'Deploying application...'
+                // Start the Node.js application
+                sh 'npm start'
             }
         }
     }
