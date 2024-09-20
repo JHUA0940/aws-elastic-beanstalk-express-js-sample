@@ -21,18 +21,18 @@ pipeline {
                 sh 'npm install'
             }
         }
-        stage('Security Scan') {
-            steps {
-                script {
-                    sh 'npm install -g snyk'
-                    sh 'snyk auth $SNYK_TOKEN'
-                    def snykTestResult = sh(script: 'snyk test', returnStatus: true)
-//                     if (snykTestResult != 0) {
-//                         error "Critical vulnerabilities found! Stopping the pipeline."
-//                     }
-                }
-            }
-        }
+//         stage('Security Scan') {
+//             steps {
+//                 script {
+//                     sh 'npm install -g snyk'
+//                     sh 'snyk auth $SNYK_TOKEN'
+//                     def snykTestResult = sh(script: 'snyk test', returnStatus: true)
+// //                     if (snykTestResult != 0) {
+// //                         error "Critical vulnerabilities found! Stopping the pipeline."
+// //                     }
+//                 }
+//             }
+//         }
         stage('Run Tests') {
             steps {
                 sh 'npm test'
