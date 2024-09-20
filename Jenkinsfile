@@ -7,6 +7,8 @@ pipeline {
     }
     environment {
         SNYK_TOKEN = credentials('21712836')  // Use the specified Snyk credentials ID
+        DOCKER_HOST = 'tcp://dind:2376'        // 设置 Docker 主机为 DinD 服务
+        DOCKER_TLS_VERIFY = '0'                // 禁用 TLS 验证
     }
     stages {
         stage('Checkout') {
