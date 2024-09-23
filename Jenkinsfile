@@ -14,7 +14,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:16'
-                    args '--network project2-compose_jenkins_network'  // 更新网络名称
+                    args '--network project_network'  // 使用自定义网络名称
                 }
             }
             steps {
