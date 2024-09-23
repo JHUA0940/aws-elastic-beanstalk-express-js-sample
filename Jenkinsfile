@@ -14,7 +14,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:16'
-                    args '--network project_network'  // 使用自定义网络名称
+                    args '--network project2-compose_project_network'  // 使用 docker-compose 自动生成的网络名称
                 }
             }
             steps {
