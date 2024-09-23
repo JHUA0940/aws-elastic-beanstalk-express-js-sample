@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM',
-                    branches: [[name: 'refs/heads/main']],  // 指定 main 分支
+                    branches: [[name: 'refs/heads/main']],
                     userRemoteConfigs: [[url: 'https://github.com/JHUA0940/aws-elastic-beanstalk-express-js-sample.git']]
                 ])
             }
@@ -14,7 +14,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:16'
-                    args '--network jenkins_network'  // 确保 Docker 操作在与 dind 相同的网络下
+                    args '--network project2-compose_jenkins_network'  // 更新网络名称
                 }
             }
             steps {
