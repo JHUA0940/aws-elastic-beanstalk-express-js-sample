@@ -2,12 +2,8 @@ pipeline {
     agent {
         docker {
             image 'node:16'
-            args '-u root'  // Run as root user to install dependencies
+            args '-u root --network jenkins_network'  // Use root user and ensure it's in the correct network
         }
-    }
-    environment {
-        DOCKER_HOST = 'tcp://dind:2376'        // 设置 Docker 主机为 DinD 服务
-        DOCKER_TLS_VERIFY = '0'                // 禁用 TLS 验证
     }
     stages {
         stage('Checkout') {
@@ -18,6 +14,10 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
+                // Output node and npm versions for debugging
+                sh 'node -v'
+                sh 'npm -v'
+
                 // Install project dependencies
                 sh 'npm install'
             }
