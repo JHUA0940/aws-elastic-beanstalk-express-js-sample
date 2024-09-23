@@ -1,20 +1,20 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16'
-            args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
+
     stages {
         stage('Checkout') {
             steps {
-                // 拉取代码
                 git 'https://github.com/JHUA0940/aws-elastic-beanstalk-express-js-sample.git'
             }
         }
         stage('Install Dependencies') {
+            agent {
+                docker {
+                    image 'node:16'
+                    args '--network jenkins_network'  // 确保 Docker 操作在与 `dind` 同一网络
+                }
+            }
             steps {
-                // 安装项目依赖项
                 sh 'npm install'
             }
         }
@@ -37,11 +37,9 @@ pipeline {
             cleanWs()
         }
         success {
-            // 构建成功提示
             echo 'Pipeline succeeded!'
         }
         failure {
-            // 构建失败提示
             echo 'Pipeline failed!'
         }
     }
