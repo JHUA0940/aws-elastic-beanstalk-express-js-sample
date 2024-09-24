@@ -47,27 +47,39 @@ pipeline {
             }
         }
 
+        // Uncomment the solution you prefer
+
+        // --- Solution 1: Chain the Commands ---
         stage('Security Scan') {
             steps {
                 script {
                     echo "Running Snyk Security Scan..."
-                    // Install Snyk CLI
                     sh """
                     docker run --rm --network ${DOCKER_NETWORK} \
                         -v ${env.WORKSPACE}:/workspace \
                         -w /workspace \
-                        node:16 sh -c "npm install -g snyk"
-                    """
-                    // Run Snyk test without authentication
-                    sh """
-                    docker run --rm --network ${DOCKER_NETWORK} \
-                        -v ${env.WORKSPACE}:/workspace \
-                        -w /workspace \
-                        node:16 sh -c "snyk test --severity-threshold=high"
+                        node:16 sh -c "npm install -g snyk && snyk test --severity-threshold=high"
                     """
                 }
             }
         }
+
+        /*
+        // --- Solution 2: Use Snyk's Official Docker Image ---
+        stage('Security Scan') {
+            steps {
+                script {
+                    echo "Running Snyk Security Scan with Snyk Docker Image..."
+                    sh """
+                    docker run --rm --network ${DOCKER_NETWORK} \
+                        -v ${env.WORKSPACE}:/project \
+                        -w /project \
+                        snyk/snyk-cli snyk test --severity-threshold=high
+                    """
+                }
+            }
+        }
+        */
 
         stage('Build Docker Image') {
             steps {
