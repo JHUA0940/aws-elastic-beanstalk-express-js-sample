@@ -8,6 +8,7 @@ pipeline {
                     branches: [[name: 'refs/heads/main']],
                     userRemoteConfigs: [[url: 'https://github.com/JHUA0940/aws-elastic-beanstalk-express-js-sample.git']]
                 ])
+                sh 'ls -la' // 查看目录结构，确保 package.json 存在
             }
         }
 
@@ -29,9 +30,6 @@ pipeline {
                 }
             }
             steps {
-                // 网络连接性检查
-                sh 'echo "Checking network connectivity..."'
-                sh 'ping -c 3 google.com'
                 // 安装依赖
                 sh 'npm install'
             }
