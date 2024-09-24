@@ -5,7 +5,7 @@ pipeline {
         DOCKER_NETWORK = 'project_network'
         DOCKER_IMAGE = 'express-app'
         DOCKER_CONTAINER_NAME = 'express-app-container'
-        DOCKER_BUILDKIT = '0' // 禁用 BuildKit
+        DOCKER_BUILDKIT = '0' // Disable BuildKit
     }
 
     stages {
@@ -17,16 +17,16 @@ pipeline {
                         userRemoteConfigs: [[url: 'https://github.com/JHUA0940/aws-elastic-beanstalk-express-js-sample.git']]
                     ])
                 }
-                sh 'ls -la' // 查看目录结构，确保 package.json 存在
+                sh 'ls -la' // List directory structure to ensure package.json exists
             }
         }
 
         stage('Setup Network') {
             steps {
                 script {
-                    // 如果网络已存在，不会报错
+                    // Create network if it doesn't exist
                     sh "docker network create ${DOCKER_NETWORK} || true"
-                    // 检查网络是否创建成功
+                    // Inspect network to ensure it's created
                     sh "docker network inspect ${DOCKER_NETWORK}"
                 }
             }
@@ -35,10 +35,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // 打印当前 Jenkins 工作空间路径，便于调试
                     echo "Jenkins workspace: ${env.WORKSPACE}"
-
-                    // 使用 docker run 手动管理容器，并使用相同的路径映射
+                    // Install project dependencies
                     sh """
                     docker run --rm --network ${DOCKER_NETWORK} \
                         -v ${env.WORKSPACE}:/workspace \
@@ -49,11 +47,32 @@ pipeline {
             }
         }
 
+        stage('Security Scan') {
+            steps {
+                script {
+                    echo "Running Snyk Security Scan..."
+                    // Install Snyk CLI
+                    sh """
+                    docker run --rm --network ${DOCKER_NETWORK} \
+                        -v ${env.WORKSPACE}:/workspace \
+                        -w /workspace \
+                        node:16 sh -c "npm install -g snyk"
+                    """
+                    // Run Snyk test without authentication
+                    sh """
+                    docker run --rm --network ${DOCKER_NETWORK} \
+                        -v ${env.WORKSPACE}:/workspace \
+                        -w /workspace \
+                        node:16 sh -c "snyk test --severity-threshold=high"
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     echo "Building Docker Image..."
-                    // 构建 Docker 镜像，指定 Dockerfile 路径（如有需要）
                     sh "DOCKER_BUILDKIT=0 docker build --network ${DOCKER_NETWORK} -t ${DOCKER_IMAGE} ."
                 }
             }
@@ -62,18 +81,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // 先停止并移除可能存在的旧容器
+                    // Stop and remove existing container if it exists
                     sh '''
                     if [ $(docker ps -q -f name=${DOCKER_CONTAINER_NAME}) ]; then
                         docker stop ${DOCKER_CONTAINER_NAME}
                         docker rm ${DOCKER_CONTAINER_NAME}
                     fi
                     '''
-                    // 启动新的 Docker 容器，并为容器指定名称
+                    // Run new Docker container with specified name
                     sh "docker run --network ${DOCKER_NETWORK} -d -p 8081:8081 --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE}"
-                    // 检查容器状态
+                    // Check container status
                     sh 'docker ps'
-                    // 查看容器日志
+                    // View container logs
                     sh "docker logs ${DOCKER_CONTAINER_NAME}"
                 }
             }
@@ -82,7 +101,7 @@ pipeline {
 
     post {
         always {
-            // 清理工作区
+            // Clean up workspace
             cleanWs()
         }
         success {
