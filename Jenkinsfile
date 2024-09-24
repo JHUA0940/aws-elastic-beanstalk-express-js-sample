@@ -32,15 +32,17 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            agent {
-                docker {
-                    image 'node:16'
-                    args '-u root --network project_network'
-                }
-            }
             steps {
-                // 安装依赖
-                sh 'npm install'
+                script {
+                    // 使用 docker.image('node:16').inside 来确保工作空间路径的映射一致性
+                    docker.image('node:16').inside("--network ${DOCKER_NETWORK} -v ${env.WORKSPACE}:${env.WORKSPACE} -w ${env.WORKSPACE}") {
+                        // 输出当前目录结构
+                        sh 'pwd'
+                        sh 'ls -la'
+                        // 安装依赖
+                        sh 'npm install'
+                    }
+                }
             }
         }
 
