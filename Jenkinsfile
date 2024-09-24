@@ -12,14 +12,14 @@ pipeline {
         }
         stage('Setup Network') {
             steps {
-                sh 'docker network create project2-compose_project_network || true'
+                sh 'docker network create project_network || true'
             }
         }
         stage('Install Dependencies') {
             agent {
                 docker {
                     image 'node:16'
-                    args '--network project2-compose_project_network'  // 指定正确的网络名称
+                    args '--network project_network'  // 使用显式指定的网络名称
                 }
             }
             steps {
