@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     // 使用 docker.image('node:16').inside 来确保工作空间路径的映射一致性
-                    docker.image('node:16').inside("--network ${DOCKER_NETWORK} -v ${env.WORKSPACE}:${env.WORKSPACE} -w ${env.WORKSPACE}") {
+                    docker.image('node:16').inside("--network ${DOCKER_NETWORK} -v ${env.WORKSPACE}:/workspace -w /workspace") {
                         // 输出当前目录结构
                         sh 'pwd'
                         sh 'ls -la'
