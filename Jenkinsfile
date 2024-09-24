@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Replace with your actual repository if needed
                 checkout([$class: 'GitSCM',
                     branches: [[name: 'refs/heads/main']],
                     userRemoteConfigs: [[url: 'https://github.com/JHUA0940/aws-elastic-beanstalk-express-js-sample.git']]
@@ -19,7 +20,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:16'
-                    args '--network project_network'  // 使用显式指定的网络名称
+                    args '--network project_network --cgroupns host'
                 }
             }
             steps {
@@ -28,12 +29,12 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t express-app .'
+                sh 'docker build --network project_network --cgroupns host -t express-app .'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 8081:8081 express-app'
+                sh 'docker run --network project_network --cgroupns host -d -p 8081:8081 express-app'
             }
         }
     }
