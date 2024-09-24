@@ -5,6 +5,7 @@ pipeline {
         DOCKER_NETWORK = 'project_network'
         DOCKER_IMAGE = 'express-app'
         DOCKER_CONTAINER_NAME = 'express-app-container'
+        DOCKER_BUILDKIT = '0' // 禁用 BuildKit
     }
 
     stages {
@@ -53,7 +54,7 @@ pipeline {
                 script {
                     echo "Building Docker Image..."
                     // 构建 Docker 镜像，指定 Dockerfile 路径（如有需要）
-                    sh "docker build --network ${DOCKER_NETWORK} -t ${DOCKER_IMAGE} ."
+                    sh "DOCKER_BUILDKIT=0 docker build --network ${DOCKER_NETWORK} -t ${DOCKER_IMAGE} ."
                 }
             }
         }
