@@ -1,20 +1,20 @@
-# 选择基础镜像，这里选择较小的 node:16-alpine 版本
+# Choose base image, here select the smaller node:16-alpine version
 FROM node:16-alpine
 
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 复制 package.json 和 package-lock.json 文件
+# Copy package.json and package-lock.json files
 COPY package*.json ./
 
-# 安装依赖
+# Install dependencies
 RUN npm install
 
-# 复制项目的所有文件到容器中
+# Copy all project files into the container
 COPY . .
 
-# 暴露应用程序的端口
+# Expose application port
 EXPOSE 8081
 
-# 启动应用程序
+# Start the application
 CMD ["npm", "start"]
