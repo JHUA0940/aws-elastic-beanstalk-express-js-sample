@@ -6,6 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'express-app'
         DOCKER_CONTAINER_NAME = 'express-app-container'
         DOCKER_BUILDKIT = '0' // Disable BuildKit
+        SNYK_TOKEN = credentials('test21712836')
     }
 
     stages {
@@ -47,9 +48,6 @@ pipeline {
             }
         }
 
-        // Uncomment the solution you prefer
-
-        // --- Solution 1: Chain the Commands ---
         stage('Security Scan') {
             steps {
                 script {
@@ -58,28 +56,12 @@ pipeline {
                     docker run --rm --network ${DOCKER_NETWORK} \
                         -v ${env.WORKSPACE}:/workspace \
                         -w /workspace \
+                        -e SNYK_TOKEN=${SNYK_TOKEN} \
                         node:16 sh -c "npm install -g snyk && snyk test --severity-threshold=high"
                     """
                 }
             }
         }
-
-        /*
-        // --- Solution 2: Use Snyk's Official Docker Image ---
-        stage('Security Scan') {
-            steps {
-                script {
-                    echo "Running Snyk Security Scan with Snyk Docker Image..."
-                    sh """
-                    docker run --rm --network ${DOCKER_NETWORK} \
-                        -v ${env.WORKSPACE}:/project \
-                        -w /project \
-                        snyk/snyk-cli snyk test --severity-threshold=high
-                    """
-                }
-            }
-        }
-        */
 
         stage('Build Docker Image') {
             steps {
