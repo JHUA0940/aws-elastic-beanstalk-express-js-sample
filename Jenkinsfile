@@ -10,6 +10,11 @@ pipeline {
                 ])
             }
         }
+        stage('Setup Network') {
+            steps {
+                sh 'docker network create project2-compose_project_network || true'
+            }
+        }
         stage('Install Dependencies') {
             agent {
                 docker {
