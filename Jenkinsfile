@@ -34,11 +34,18 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
+                    // 打印当前 Jenkins 工作空间路径，便于调试
+                    echo "Jenkins workspace: ${env.WORKSPACE}"
+
                     // 使用 docker.image('node:16').inside 来确保工作空间路径的映射一致性
                     docker.image('node:16').inside("--network ${DOCKER_NETWORK} -v ${env.WORKSPACE}:/workspace -w /workspace") {
-                        // 输出当前目录结构
+                        // 输出当前目录结构，确保路径正确
                         sh 'pwd'
                         sh 'ls -la'
+
+                        // 打印工作目录，确保 npm install 的路径正确
+                        sh 'echo "Current directory: $(pwd)"'
+
                         // 安装依赖
                         sh 'npm install'
                     }
